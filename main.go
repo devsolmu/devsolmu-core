@@ -1,9 +1,14 @@
 package main
 
-func main() {
-	config := GetConfig()
+import (
+	"github.com/devsolmu/devsolmu-core/app"
+	"github.com/devsolmu/devsolmu-core/config"
+)
 
-	app := &App{}
+func main() {
+	config := config.GetConfig()
+
+	app := &app.App{}
 	app.Initialize(config)
 	app.Run(":3000")
 }

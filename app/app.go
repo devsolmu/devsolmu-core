@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/devsolmu/devsolmu-core/app"
+	"github.com/devsolmu/devsolmu-core/model"
+	"github.com/devsolmu/devsolmu-core/config"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
@@ -16,7 +19,7 @@ type App struct {
 }
 
 // Initialize initializes the app with predefined configuration
-func (app *App) Initialize(config *Config) {
+func (app *App) Initialize(config *config.Config) {
 	dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
 		config.DB.Password,

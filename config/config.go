@@ -1,4 +1,4 @@
-package main
+package config
 
 // Config define DBConfig
 type Config struct {
