@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/devsolmu/devsolmu-core/app"
-	"github.com/devsolmu/devsolmu-core/model"
 	"github.com/devsolmu/devsolmu-core/config"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
