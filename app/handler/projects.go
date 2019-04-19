@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/devsolmu/devsolmu-core/model"
+	"github.com/devsolmu/devsolmu-core/app/model"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
@@ -21,7 +21,7 @@ func GetProject(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	title := vars["title"]
-	project := GetProjectOr404(db, title, w, r)
+	project := getProjectOr404(db, title, w, r)
 	if project == nil {
 		return
 	}
@@ -33,14 +33,14 @@ func CreateProject(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	project := model.Project{}
 
 	decoder := json.NewDecoder(r.Body)
-	if error := decoder.Decode(&project); error != nil {
-		respondError(w, http.StatusBadRequest, error.Error())
+	if err := decoder.Decode(&project); err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	defer r.Body.Close()
 
-	if error := db.Save(&project).Error; error != nil {
-		respondError(w, http.StatusInternalServerError, error.Error())
+	if err := db.Save(&project).Error; err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondJSON(w, http.StatusCreated, project)
@@ -51,20 +51,20 @@ func UpdateProject(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	title := vars["title"]
-	project := GetProjectOr404(db, title, w, r)
+	project := getProjectOr404(db, title, w, r)
 	if project == nil {
 		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	if error := decoder.Decode(&project); error != nil {
-		respondError(w, http.StatusBadRequest, error.Error())
+	if err := decoder.Decode(&project); err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	defer r.Body.Close()
 
-	if error := db.Save(&project).Error; error != nil {
-		respondError(w, http.StatusInternalServerError, error.Error())
+	if err := db.Save(&project).Error; err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondJSON(w, http.StatusOK, project)
@@ -75,23 +75,22 @@ func DeleteProject(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	title := vars["title"]
-	project := GetProjectOr404(db, title, w, r)
+	project := getProjectOr404(db, title, w, r)
 	if project == nil {
 		return
 	}
-
-	if error := db.Delete(&project).Error; error != nil {
-		respondError(w, http.StatusInternalServerError, error.Error())
+	if err := db.Delete(&project).Error; err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondJSON(w, http.StatusNoContent, nil)
 }
 
-// GetProjectOr404 is getting a project or output 404 error
-func GetProjectOr404(db *gorm.DB, title string, w http.ResponseWriter, r *http.Request) *model.Project {
+// getProjectOr404 gets a project instance if exists, or respond the 404 error otherwise
+func getProjectOr404(db *gorm.DB, title string, w http.ResponseWriter, r *http.Request) *model.Project {
 	project := model.Project{}
-	if error := db.First(&project, model.Project{Title: title}).Error; error != nil {
-		respondError(w, http.StatusNotFound, error.Error())
+	if err := db.First(&project, model.Project{Title: title}).Error; err != nil {
+		respondError(w, http.StatusNotFound, err.Error())
 		return nil
 	}
 	return &project

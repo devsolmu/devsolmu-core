@@ -5,16 +5,15 @@ import (
 	"net/http"
 )
 
-// respondJSON makes response with payload as json format
+// respondJSON makes the response with payload as json format
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
-	response, error := json.Marshal(payload)
-	if error != nil {
+	response, err := json.Marshal(payload)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(error.Error()))
+		w.Write([]byte(err.Error()))
 		return
 	}
-
-	w.Header().Set("Content=Type", "application/sion")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write([]byte(response))
 }
