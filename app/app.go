@@ -1,16 +1,18 @@
-package main
+package app
 
 import (
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/devsolmu/devsolmu-core/app/handler"
+	"github.com/devsolmu/devsolmu-core/app/model"
 	"github.com/devsolmu/devsolmu-core/config"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
 
-// App has router and db instance
+// App has router and db instances
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
@@ -24,12 +26,12 @@ func (app *App) Initialize(config *config.Config) {
 		config.DB.Name,
 		config.DB.Charset)
 
-	db, error := gorm.Open(config.DB.Dialect, dbURI)
-	if error != nil {
+	db, err := gorm.Open(config.DB.Dialect, dbURI)
+	if err != nil {
 		log.Fatal("Could not connect database")
 	}
 
-	app.DB = DBMigrate(db)
+	app.DB = model.DBMigrate(db)
 	app.Router = mux.NewRouter()
 	app.setRouters()
 }
@@ -38,12 +40,10 @@ func (app *App) Initialize(config *config.Config) {
 func (app *App) setRouters() {
 	// Routing for handling the projects
 	app.Get("/projects", app.GetAllProjects)
-	app.Get("/projects", app.GetProject)
 	app.Post("/projects", app.CreateProject)
-	app.Put("/projects", app.UpdateProject)
-	app.Delete("/projects", app.DeleteProject)
-
-	// Others...
+	app.Get("/projects/{title}", app.GetProject)
+	app.Put("/projects/{title}", app.UpdateProject)
+	app.Delete("/projects/{title}", app.DeleteProject)
 }
 
 // Get wraps the router for GET method
@@ -64,6 +64,29 @@ func (app *App) Put(path string, f func(w http.ResponseWriter, r *http.Request))
 // Delete wraps the router for DELETE method
 func (app *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	app.Router.HandleFunc(path, f).Methods("DELETE")
+}
+
+/*
+** Projects Handlers
+ */
+func (app *App) GetAllProjects(w http.ResponseWriter, r *http.Request) {
+	handler.GetAllProjects(app.DB, w, r)
+}
+
+func (app *App) CreateProject(w http.ResponseWriter, r *http.Request) {
+	handler.CreateProject(app.DB, w, r)
+}
+
+func (app *App) GetProject(w http.ResponseWriter, r *http.Request) {
+	handler.GetProject(app.DB, w, r)
+}
+
+func (app *App) UpdateProject(w http.ResponseWriter, r *http.Request) {
+	handler.UpdateProject(app.DB, w, r)
+}
+
+func (app *App) DeleteProject(w http.ResponseWriter, r *http.Request) {
+	handler.DeleteProject(app.DB, w, r)
 }
 
 // Run the app on it's router
