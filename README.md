@@ -1,25 +1,19 @@
-# Devsolmu Core
-
-Devsolmu Core is APIs for Devsolmu service.
+# Golang Web API Template
 
 ## Getting Started
 
-The mirror of the Devsolmu source tree can be checked out with the following command:
+1. Clone
+
 ```
-$ git clone https://github.com/devsolmu/devsolmu-core.git
+$ git clone https://github.com/shimonosatoru/golang-template.git
 ```
 
-And build
+2. Run
 ```
-$ go build
-$ ./devsolmu-core
+$ go run main.go
 ```
 
 Open this to view it in the browser.
 ```
 http://localhost:3000
 ```
-
-## Resources
-
-Coming soon...
